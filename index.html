@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="styles.css" rel="stylesheet">
+    <script defer src="script.js"></script>
+    <title>QuizApp Using JavaScript</title>
+
+    <style>
+      
+      :root {
+  --hue-neutral: 200;
+  --hue-wrong: 0;
+  --hue-correct: 145;
+}
+        body {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background-image:url('file:///C:/Users/hp/Documents/dwnld%20images/quizz%20back.jpg');
+  background-size: cover;
+}
+/*body.correct {
+  
+  background-color: hsl(var(--hue-correct), 100%, 20%);
+  
+}
+
+body.wrong {
+  background-color: hsl(var(--hue-wrong), 100%, 20%);
+}*/
+
+
+    #box{
+        background-image:url('file:///C:/Users/hp/Documents/dwnld%20images/network.gif');
+        height:90px;
+        width:800px;
+        display:flex;
+        justify-content: center;
+        align-items: center;   
+         
+        
+    }
+
+    .btn:hover{
+        
+        border:4px solid black;
+        background-color:cyan;
+       }
+       .btn {
+  --hue: var(--hue-neutral);
+  border: 1px solid burlywood;
+  background-color: whitesmoke;
+  border-radius: 5px;
+  padding: 10px 10px;
+  
+  outline: none;
+  font-size:20px;
+  
+}
+
+    .start-btn{
+        font-size: 1.5rem;
+        font-weight: bold;
+        padding: 10px 20px;
+        color:black;
+    }
+    .next-btn{
+        font-size: 1.5rem;
+        font-weight: bold;
+        padding: 10px 20px;
+        background-color:skyblue;     
+        color:black;
+      }
+    #container {
+  width: 800px;
+  max-width: 80%;
+  background-image:url('file:///C:/Users/hp/Documents/dwnld%20images/network.gif');
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 0 10px 4px cyan;  
+  font-weight: bold;
+}
+.hide {
+  display: none;
+}
+.btn-grid {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.btn.wrong {
+  
+  background-color: hsl(var(--hue-wrong), 100%, 30%);
+  color:white;
+  
+
+}
+
+.btn.correct {
+  background-color: hsl(var(--hue-correct), 100%, 40%);
+  font-weight: bolder;
+  color:white;
+}
+#question{
+  border: 1px solid burlywood;
+  background-color: #b5d7f7;
+  border-radius: 5px;
+  padding: 5px 10px;
+  color: black;
+  outline: none;
+  font-size:20px;
+  height:30px;
+}
+
+
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="question-container" class="hide">
+            <div id="question">Question</div>
+                <div id="answer-button" class="btn-grid">
+                    <button class="btn">Answer1</button>
+                    <button class="btn">Answer2</button>
+                    <button class="btn">Answer3</button>
+                    <button class="btn">Answer4</button>
+                </div>
+        </div>
+
+<div id="box">
+    <button id="start-btn" class="start-btn btn">Start</button>
+    <button id="next-btn" class="next-btn btn hide">Next</button>    
+</div> 
+</div>   
+
+</body>
+<script>
+    //variable declaration
+    const StartButton=document.getElementById('start-btn');
+    const NextButton=document.getElementById('next-btn');
+    const WholeContainer=document.getElementById('container');
+    const QuestionContainer=document.getElementById('question-container');
+    const AllQuestionElement=document.getElementById('question');
+    const AnswerButtonElement=document.getElementById('answer-button');
+    let currentQuestionIndex,  shuffledQuestions
+   //add eventListener
+    StartButton.addEventListener('click', startGame);
+    NextButton.addEventListener('click', () => {
+    currentQuestionIndex++;
+    setNextQuestion();
+        });
+//Game initialization
+    function startGame() {
+  StartButton.classList.add('hide');//hiding the Start button
+  shuffledQuestions = questions.sort(() => Math.random() - 0.5);//Shuffling the questions array
+  currentQuestionIndex = 0;//Resetting the current question index
+  QuestionContainer.classList.remove('hide');//Revealing the question container
+  setNextQuestion();//Displaying the first question
+}
+function setNextQuestion() {
+  resetState()
+  showQuestion(shuffledQuestions[currentQuestionIndex])
+}
+
+//Displaying Questions
+function showQuestion(question) {
+    AllQuestionElement.innerText = question.question
+  question.answers.forEach(answer => {
+    const button = document.createElement('button')
+    button.innerText = answer.text
+    button.classList.add('btn')
+    if (answer.correct) {
+      button.dataset.correct = answer.correct
+    }
+    button.addEventListener('click', selectAnswer)
+    AnswerButtonElement.appendChild(button)
+  })
+}
+
+function resetState() {
+  clearStatusClass(document.body)
+  NextButton.classList.add('hide')
+  while (AnswerButtonElement.firstChild) {
+    AnswerButtonElement.removeChild(AnswerButtonElement.firstChild)
+  }
+}
+
+
+// Answer Selection
+function selectAnswer(e) {
+  const selectedButton = e.target;
+  const correct = selectedButton.dataset.correct;
+  setStatusClass(document.body, correct);
+  Array.from(AnswerButtonElement.children).forEach(button => {
+    setStatusClass(button, button.dataset.correct);
+    if (button.dataset.correct === "true") {
+      const emoji = document.createElement('span');
+      emoji.innerHTML = '&#129321'; 
+      button.appendChild(emoji);
+    }
+  });
+  if (shuffledQuestions.length > currentQuestionIndex + 1) {
+    NextButton.classList.remove('hide');
+  } else {
+    StartButton.innerText = 'Restart';
+    StartButton.classList.remove('hide');
+  }
+}
+
+// Set status class for an element
+function setStatusClass(element, correct) {
+  clearStatusClass(element); // Clear existing classes on the element
+  if (correct) {
+    element.classList.add('correct'); // Add 'correct' class to the element
+  } else {
+    element.classList.add('wrong'); // Add 'wrong' class to the element
+  }
+}
+
+// Clear status classes from an element
+function clearStatusClass(element) {
+  element.classList.remove('correct');
+  element.classList.remove('wrong');
+}
+
+
+
+
+// Set status class for an element
+function setStatusClass(element, correct) {
+  clearStatusClass(element); // Clear existing classes on the element
+  if (correct) {
+    element.classList.add('correct'); // Add 'correct' class to the element
+  } else {
+    element.classList.add('wrong'); // Add 'wrong' class to the element
+  }
+}
+
+// Clear status classes from an element
+function clearStatusClass(element) {
+  element.classList.remove('correct');
+  element.classList.remove('wrong');
+}
+
+
+
+function clearStatusClass(element) {
+  element.classList.remove('correct')
+  element.classList.remove('wrong')
+}
+
+const questions = [
+  {
+    question: 'What is the capital of India?',
+    answers: [
+      { text: 'kolkata', correct: false },
+      { text: 'New Delhi', correct: true }
+    ]
+  },
+  {
+    question: 'Rainbow consist of how many colours?',
+    answers: [
+      { text: '7 colours', correct: true },
+      { text: '9 colours', correct: false },
+      { text: '15 colours', correct:false },
+      { text: '5 colours', correct:false }
+    ]
+  },
+  {
+    question: 'Which animal is known as the king of the jungle?',
+    answers: [
+      { text: 'Tiger', correct: false },
+      { text: 'Lion', correct: true },
+      { text: 'Elephant', correct: false },
+      { text: 'Leopard', correct: false }
+    ]
+  },
+  {
+    question: 'What is the National Anthem of India?',
+    answers: [
+      { text: 'Maa Jujhe Salam', correct: false },
+      { text: 'Jana Gana Mana', correct: true }
+    ]
+  }
+]
+
+
+</script>
+
+
+</html>
